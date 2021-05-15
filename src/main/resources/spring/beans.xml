@@ -1,0 +1,52 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+	
+	<!-- 1、将DruidDataSource(druid连接池)作为bean装配到spring容器中，
+		class是druid连接池类的全路径 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<!-- 配置连接数据库的基本信息 -->
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql:///yonghedb?characterEncoding=utf-8&amp;serverTimezone=Asia/Shanghai"/>
+		<property name="username" value="root"/>
+		<property name="password" value="root"/>
+	</bean>
+	
+	<!-- 2、整合spring和mybatis框架
+		将sqlSessionFactory作为bean装配到Spring容器中
+		id值(sqlSessionFactory)是固定值
+	 -->
+	<bean id="sqlSessionFactory" 
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 2.1.指定mybatis核心配置文件的位置 -->
+		<property name="configLocation" 
+				value="classpath:mybatis/mybatis-config.xml"></property>
+		<!-- 2.2.配置连接池(数据源) ref指向连接池bean对象的id值 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 2.3、扫描所有的 XxxMapper.xml映射文件，读取其中配置的SQL语句 -->
+		<property name="mapperLocations" value="classpath:mybatis/mapper/*.xml"/>
+	</bean>
+	
+	<!-- 3、定义mapper接口扫描器
+		如果bean标签上没有id,默认id值是当前类的类名,首字母小写
+		扫描 com.tedu.dao包下的所有mapper接口,由框架为mapper接口提供实现类
+		由spring容器负责创建接口的子类实例(spring会将创建好的接口子类实例存到map中)
+	 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描所有XxxMapper接口，将接口实例的创建交给spring容器 -->
+		<property name="basePackage" 
+			value="com.tedu.dao"/>
+	</bean>
+	
+	
+</beans>
+
+
+
+
